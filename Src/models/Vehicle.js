@@ -129,7 +129,7 @@
 
 // // ✅ Check if model exists before creating
 // const Vehicle = mongoose.models.Vehicle || mongoose.model('Vehicle', vehicleSchema);
-
+//Path: Src/models/Vehicle.js
 import mongoose from 'mongoose';
 import './User'; // ✅ Import User model first
 

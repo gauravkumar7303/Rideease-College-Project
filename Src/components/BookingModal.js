@@ -1,268 +1,4 @@
-// 'use client'
-
-// import { useState } from 'react'
-// import { 
-//   FaTimes, 
-//   FaCalendarAlt, 
-//   FaMapMarkerAlt, 
-//   FaUser, 
-//   FaCreditCard, 
-//   FaCheckCircle,
-//   FaArrowLeft,
-//   FaArrowRight
-// } from 'react-icons/fa'
-// import { toast } from 'react-toastify'
-
-// export default function BookingModal({ vehicle, isOpen, onClose }) {
-//   const [currentStep, setCurrentStep] = useState(1)
-//   const [bookingData, setBookingData] = useState({
-//     pickupDate: '',
-//     returnDate: '',
-//     pickupLocation: '',
-//     returnLocation: '',
-//     withDriver: false,
-//     paymentMethod: 'upi'
-//   })
-
-//   if (!isOpen) return null
-
-//   const steps = [
-//     { number: 1, title: 'Dates', icon: <FaCalendarAlt /> },
-//     { number: 2, title: 'Location', icon: <FaMapMarkerAlt /> },
-//     { number: 3, title: 'Payment', icon: <FaCreditCard /> },
-//     { number: 4, title: 'Confirm', icon: <FaCheckCircle /> }
-//   ]
-
-//   const handleNext = () => {
-//     if (currentStep < 4) {
-//       setCurrentStep(currentStep + 1)
-//     } else {
-//       handleConfirm()
-//     }
-//   }
-
-//   const handlePrevious = () => {
-//     if (currentStep > 1) {
-//       setCurrentStep(currentStep - 1)
-//     }
-//   }
-
-//   const handleConfirm = () => {
-//     toast.success('Booking confirmed successfully!')
-//     onClose()
-//   }
-
-//   const handleInputChange = (field, value) => {
-//     setBookingData(prev => ({
-//       ...prev,
-//       [field]: value
-//     }))
-//   }
-
-//   const calculateTotal = () => {
-//     const days = bookingData.returnDate && bookingData.pickupDate ? 
-//       Math.ceil((new Date(bookingData.returnDate) - new Date(bookingData.pickupDate)) / (1000 * 60 * 60 * 24)) : 1
-//     return vehicle.price * days + (bookingData.withDriver ? 500 * days : 0) + 300
-//   }
-
-//   return (
-//     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-//       <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-//         {/* Header */}
-//         <div className="flex justify-between items-center p-6 border-b">
-//           <h2 className="text-2xl font-semibold">Book {vehicle?.brand} {vehicle?.model}</h2>
-//           <button
-//             onClick={onClose}
-//             className="p-2 hover:bg-gray-100 rounded-lg"
-//           >
-//             <FaTimes />
-//           </button>
-//         </div>
-
-//         {/* Steps Indicator */}
-//         <div className="px-6 py-4 border-b">
-//           <div className="flex justify-between">
-//             {steps.map((step) => (
-//               <div key={step.number} className="flex flex-col items-center">
-//                 <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${
-//                   step.number === currentStep 
-//                     ? 'bg-[--color-primary-600] text-white' 
-//                     : step.number < currentStep 
-//                     ? 'bg-green-500 text-white' 
-//                     : 'bg-gray-200 text-gray-500'
-//                 }`}>
-//                   {step.number === currentStep ? step.icon : step.number}
-//                 </div>
-//                 <span className="text-sm">{step.title}</span>
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-
-//         {/* Content */}
-//         <div className="p-6">
-//           {currentStep === 1 && (
-//             <div>
-//               <h3 className="text-lg font-semibold mb-4">Select Dates</h3>
-//               <div className="space-y-4">
-//                 <div>
-//                   <label className="block text-sm font-medium text-gray-700 mb-2">
-//                     Pickup Date & Time
-//                   </label>
-//                   <input
-//                     type="datetime-local"
-//                     value={bookingData.pickupDate}
-//                     onChange={(e) => handleInputChange('pickupDate', e.target.value)}
-//                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[--color-primary-500] focus:border-transparent"
-//                   />
-//                 </div>
-//                 <div>
-//                   <label className="block text-sm font-medium text-gray-700 mb-2">
-//                     Return Date & Time
-//                   </label>
-//                   <input
-//                     type="datetime-local"
-//                     value={bookingData.returnDate}
-//                     onChange={(e) => handleInputChange('returnDate', e.target.value)}
-//                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[--color-primary-500] focus:border-transparent"
-//                   />
-//                 </div>
-//               </div>
-//             </div>
-//           )}
-
-//           {currentStep === 2 && (
-//             <div>
-//               <h3 className="text-lg font-semibold mb-4">Select Location</h3>
-//               <div className="space-y-4">
-//                 <div>
-//                   <label className="block text-sm font-medium text-gray-700 mb-2">
-//                     Pickup Location
-//                   </label>
-//                   <select
-//                     value={bookingData.pickupLocation}
-//                     onChange={(e) => handleInputChange('pickupLocation', e.target.value)}
-//                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[--color-primary-500] focus:border-transparent"
-//                   >
-//                     <option value="">Select location</option>
-//                     <option value="delhi-cp">Delhi - Connaught Place</option>
-//                     <option value="delhi-aerocity">Delhi - Aerocity</option>
-//                     <option value="gurugram-cybercity">Gurugram - Cyber City</option>
-//                   </select>
-//                 </div>
-//                 <div>
-//                   <label className="block text-sm font-medium text-gray-700 mb-2">
-//                     Return Location
-//                   </label>
-//                   <select
-//                     value={bookingData.returnLocation}
-//                     onChange={(e) => handleInputChange('returnLocation', e.target.value)}
-//                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[--color-primary-500] focus:border-transparent"
-//                   >
-//                     <option value="same">Same as Pickup</option>
-//                     <option value="delhi-cp">Delhi - Connaught Place</option>
-//                     <option value="delhi-aerocity">Delhi - Aerocity</option>
-//                   </select>
-//                 </div>
-//               </div>
-//             </div>
-//           )}
-
-//           {currentStep === 3 && (
-//             <div>
-//               <h3 className="text-lg font-semibold mb-4">Payment Method</h3>
-//               <div className="space-y-4">
-//                 <label className="flex items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
-//                   <input
-//                     type="radio"
-//                     name="payment"
-//                     value="upi"
-//                     checked={bookingData.paymentMethod === 'upi'}
-//                     onChange={(e) => handleInputChange('paymentMethod', e.target.value)}
-//                     className="w-5 h-5 text-[--color-primary-600]"
-//                   />
-//                   <div>
-//                     <div className="font-semibold">UPI Payment</div>
-//                     <div className="text-gray-600 text-sm">Instant payment with UPI apps</div>
-//                   </div>
-//                 </label>
-//                 <label className="flex items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
-//                   <input
-//                     type="radio"
-//                     name="payment"
-//                     value="card"
-//                     checked={bookingData.paymentMethod === 'card'}
-//                     onChange={(e) => handleInputChange('paymentMethod', e.target.value)}
-//                     className="w-5 h-5 text-[--color-primary-600]"
-//                   />
-//                   <div>
-//                     <div className="font-semibold">Credit/Debit Card</div>
-//                     <div className="text-gray-600 text-sm">Pay with your card</div>
-//                   </div>
-//                 </label>
-//               </div>
-//             </div>
-//           )}
-
-//           {currentStep === 4 && (
-//             <div className="text-center">
-//               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-//                 <FaCheckCircle className="text-green-500 text-2xl" />
-//               </div>
-//               <h3 className="text-xl font-semibold mb-2">Confirm Booking</h3>
-//               <p className="text-gray-600 mb-6">
-//                 Total Amount: <span className="font-bold text-[--color-primary-600]">₹{calculateTotal()}</span>
-//               </p>
-//               <p className="text-gray-500 text-sm">
-//                 By confirming, you agree to our terms and conditions
-//               </p>
-//             </div>
-//           )}
-
-//           {/* Pricing Summary */}
-//           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-//             <div className="flex justify-between items-center">
-//               <div>
-//                 <div className="font-semibold">{vehicle?.brand} {vehicle?.model}</div>
-//                 <div className="text-sm text-gray-600">₹{vehicle?.price}/day</div>
-//               </div>
-//               <div className="text-lg font-bold text-[--color-primary-600]">
-//                 ₹{calculateTotal()}
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* Footer */}
-//         <div className="p-6 border-t">
-//           <div className="flex justify-between">
-//             <button
-//               onClick={handlePrevious}
-//               disabled={currentStep === 1}
-//               className={`px-6 py-3 rounded-lg font-medium ${
-//                 currentStep === 1 
-//                   ? 'text-gray-400 cursor-not-allowed' 
-//                   : 'text-[--color-primary-600] hover:bg-[--color-primary-50]'
-//               }`}
-//             >
-//               <FaArrowLeft className="inline mr-2" />
-//               Previous
-//             </button>
-            
-//             <button
-//               onClick={handleNext}
-//               className="bg-[--color-primary-600] text-white px-8 py-3 rounded-lg font-medium hover:bg-[--color-primary-700] transition-colors"
-//             >
-//               {currentStep === 4 ? 'Confirm Booking' : 'Continue'}
-//               {currentStep < 4 && <FaArrowRight className="inline ml-2" />}
-//             </button>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   )
-// }
-
+//Path:src/components/BookingModal.js
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -301,7 +37,7 @@ export default function BookingModal({ vehicle, isOpen, onClose }) {
   const [currentStep, setCurrentStep] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
   const [user, setUser] = useState(null)
-  
+
   const [bookingData, setBookingData] = useState({
     pickupDate: '',
     returnDate: '',
@@ -356,7 +92,7 @@ export default function BookingModal({ vehicle, isOpen, onClose }) {
 
   const handleNext = async () => {
     if (!await validateCurrentStep()) return
-    
+
     if (currentStep < 5) {
       setCurrentStep(currentStep + 1)
     } else {
@@ -371,7 +107,7 @@ export default function BookingModal({ vehicle, isOpen, onClose }) {
   }
 
   const validateCurrentStep = async () => {
-    switch(currentStep) {
+    switch (currentStep) {
       case 1:
         if (!bookingData.pickupDate || !bookingData.returnDate) {
           toast.error('Please select pickup and return dates')
@@ -386,14 +122,14 @@ export default function BookingModal({ vehicle, isOpen, onClose }) {
           return false
         }
         return true
-      
+
       case 2:
         if (!bookingData.rentalType) {
           toast.error('Please select rental type')
           return false
         }
         return true
-      
+
       case 3:
         const { name, email, phone, licenseNumber } = bookingData.personalDetails
         if (!name || !email || !phone || !licenseNumber) {
@@ -409,7 +145,7 @@ export default function BookingModal({ vehicle, isOpen, onClose }) {
           return false
         }
         return true
-      
+
       case 4:
         if (bookingData.paymentMethod === 'upi' && !bookingData.upiId) {
           toast.error('Please enter UPI ID')
@@ -422,7 +158,7 @@ export default function BookingModal({ vehicle, isOpen, onClose }) {
           }
         }
         return true
-      
+
       default:
         return true
     }
@@ -446,16 +182,16 @@ export default function BookingModal({ vehicle, isOpen, onClose }) {
   }
 
   const calculateTotal = () => {
-    const days = bookingData.returnDate && bookingData.pickupDate 
+    const days = bookingData.returnDate && bookingData.pickupDate
       ? Math.ceil((new Date(bookingData.returnDate) - new Date(bookingData.pickupDate)) / (1000 * 60 * 60 * 24))
       : 1
-    
+
     const baseAmount = vehicle.pricePerDay * days
     const driverCharge = bookingData.rentalType === 'withDriver' ? 500 * days : 0
     const insuranceCharges = 200 * days
     const serviceFee = 100
     const deliveryCharges = bookingData.pickupAddress ? 150 : 0
-    
+
     return {
       days,
       baseAmount,
@@ -467,15 +203,102 @@ export default function BookingModal({ vehicle, isOpen, onClose }) {
     }
   }
 
+  // const handleConfirmBooking = async () => {
+  //   setIsLoading(true)
+
+  //   try {
+  //     const total = calculateTotal()
+
+  //     const bookingPayload = {
+  //       vehicleId: vehicle._id,
+  //       customerId: user?._id,
+  //       ownerId: vehicle.owner?._id,
+  //       bookingType: bookingData.rentalType === 'withDriver' ? 'with_driver' : 'self_drive',
+  //       pickupDate: bookingData.pickupDate,
+  //       returnDate: bookingData.returnDate,
+  //       pickupLocation: bookingData.pickupLocation,
+  //       returnLocation: bookingData.returnLocation || bookingData.pickupLocation,
+  //       deliveryAddress: bookingData.pickupAddress,
+  //       totalDays: total.days,
+  //       baseAmount: total.baseAmount,
+  //       driverCharges: total.driverCharge,
+  //       insuranceCharges: total.insuranceCharges,
+  //       serviceFee: total.serviceFee,
+  //       deliveryCharges: total.deliveryCharges,
+  //       totalAmount: total.total,
+  //       securityDeposit: vehicle.securityDeposit,
+  //       paymentMethod: bookingData.paymentMethod,
+  //       customerDetails: bookingData.personalDetails,
+  //       driverRequested: bookingData.rentalType === 'withDriver',
+  //       driverHours: bookingData.driverHours,
+  //       driverLanguage: bookingData.driverLanguage
+  //     }
+
+  //     console.log('📦 Creating booking:', bookingPayload)
+
+  //     // Call your booking API here
+  //     // const response = await bookingAPI.create(bookingPayload)
+
+  //     // For now, save to localStorage
+  //     const bookings = JSON.parse(localStorage.getItem('rideease_bookings') || '[]')
+  //     const newBooking = {
+  //       id: `RE${Date.now().toString().slice(-8)}`,
+  //       ...bookingPayload,
+  //       vehicle: {
+  //         name: `${vehicle.brand} ${vehicle.model}`,
+  //         type: vehicle.vehicleType,
+  //         image: vehicle.images?.[0]?.data
+  //       },
+  //       status: 'confirmed',
+  //       bookingDate: new Date().toISOString()
+  //     }
+  //     bookings.push(newBooking)
+  //     localStorage.setItem('rideease_bookings', JSON.stringify(bookings))
+
+  //     toast.success('Booking confirmed successfully!')
+
+  //     setTimeout(() => {
+  //       onClose()
+  //       router.push('/profile?tab=bookings')
+  //     }, 1500)
+
+  //   } catch (error) {
+  //     console.error('❌ Booking error:', error)
+  //     toast.error('Failed to confirm booking. Please try again.')
+  //   } finally {
+  //     setIsLoading(false)
+  //   }
+  // }
   const handleConfirmBooking = async () => {
-    setIsLoading(true)
-    
+    setIsLoading(true);
+
     try {
-      const total = calculateTotal()
-      
+      const total = calculateTotal();
+
+      console.log('💰 [DEBUG] Total calculation:', total);
+      console.log('💰 [DEBUG] Vehicle price:', vehicle?.pricePerDay);
+      console.log('💰 [DEBUG] Days:', total.days);
+
+      // Get current user properly
+      const currentUser = getCurrentUser();
+      if (!currentUser) {
+        toast.error('Please login to continue');
+        router.push('/auth');
+        return;
+      }
+
+      // ✅ Validate total amount
+      if (total.total === 0 || isNaN(total.total)) {
+        console.error('❌ [DEBUG] Invalid total amount:', total.total);
+        toast.error('Error calculating amount. Please try again.');
+        setIsLoading(false);
+        return;
+      }
+
+      // ✅ Prepare booking payload
       const bookingPayload = {
         vehicleId: vehicle._id,
-        customerId: user?._id,
+        customerId: currentUser._id,
         ownerId: vehicle.owner?._id,
         bookingType: bookingData.rentalType === 'withDriver' ? 'with_driver' : 'self_drive',
         pickupDate: bookingData.pickupDate,
@@ -490,49 +313,79 @@ export default function BookingModal({ vehicle, isOpen, onClose }) {
         serviceFee: total.serviceFee,
         deliveryCharges: total.deliveryCharges,
         totalAmount: total.total,
-        securityDeposit: vehicle.securityDeposit,
+        securityDeposit: vehicle.securityDeposit || 5000,
         paymentMethod: bookingData.paymentMethod,
-        customerDetails: bookingData.personalDetails,
+        customerDetails: {
+          name: bookingData.personalDetails.name,
+          email: bookingData.personalDetails.email,
+          phone: bookingData.personalDetails.phone,
+          licenseNumber: bookingData.personalDetails.licenseNumber,
+          address: bookingData.personalDetails.address || '',
+          emergencyContact: bookingData.personalDetails.emergencyContact || ''
+        },
+        vehicleDetails: {
+          brand: vehicle.brand,
+          model: vehicle.model,
+          pricePerDay: vehicle.pricePerDay
+        },
         driverRequested: bookingData.rentalType === 'withDriver',
         driverHours: bookingData.driverHours,
         driverLanguage: bookingData.driverLanguage
+      };
+
+      console.log('📤 [DEBUG] Sending booking to API:', JSON.stringify(bookingPayload, null, 2));
+
+      // ✅ CALL THE ACTUAL API - DATABASE MEIN SAVE HOGA
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(bookingPayload),
+      });
+
+      const data = await response.json();
+      console.log('📥 [DEBUG] API Response:', data);
+
+      if (data.success) {
+        toast.success(`✅ Booking confirmed! Total: ₹${total.total}`);
+
+        // ✅ Also save to localStorage for backup/quick access
+        const bookings = JSON.parse(localStorage.getItem('rideease_bookings') || '[]');
+        const newBooking = {
+          id: data.booking?.id || `RE${Date.now().toString().slice(-8)}`,
+          ...bookingPayload,
+          vehicle: {
+            name: `${vehicle.brand} ${vehicle.model}`,
+            type: vehicle.vehicleType,
+            image: vehicle.images?.[0]?.data
+          },
+          status: 'confirmed',
+          bookingDate: new Date().toISOString(),
+          totalAmount: total.total,
+          databaseId: data.booking?.id
+        };
+        bookings.push(newBooking);
+        localStorage.setItem('rideease_bookings', JSON.stringify(bookings));
+
+        console.log('✅ [DEBUG] Booking saved to database and localStorage');
+
+        setTimeout(() => {
+          onClose();
+          router.push('/profile?tab=bookings');
+        }, 2000);
+      } else {
+        console.error('❌ [DEBUG] API returned error:', data.error);
+        toast.error(data.error || 'Booking failed. Please try again.');
       }
 
-      console.log('📦 Creating booking:', bookingPayload)
-      
-      // Call your booking API here
-      // const response = await bookingAPI.create(bookingPayload)
-      
-      // For now, save to localStorage
-      const bookings = JSON.parse(localStorage.getItem('rideease_bookings') || '[]')
-      const newBooking = {
-        id: `RE${Date.now().toString().slice(-8)}`,
-        ...bookingPayload,
-        vehicle: {
-          name: `${vehicle.brand} ${vehicle.model}`,
-          type: vehicle.vehicleType,
-          image: vehicle.images?.[0]?.data
-        },
-        status: 'confirmed',
-        bookingDate: new Date().toISOString()
-      }
-      bookings.push(newBooking)
-      localStorage.setItem('rideease_bookings', JSON.stringify(bookings))
-      
-      toast.success('Booking confirmed successfully!')
-      
-      setTimeout(() => {
-        onClose()
-        router.push('/profile?tab=bookings')
-      }, 1500)
-      
     } catch (error) {
-      console.error('❌ Booking error:', error)
-      toast.error('Failed to confirm booking. Please try again.')
+      console.error('❌ [DEBUG] Booking error:', error);
+      toast.error('Failed to confirm booking. Please try again.');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const total = calculateTotal()
 
@@ -560,13 +413,12 @@ export default function BookingModal({ vehicle, isOpen, onClose }) {
           <div className="flex justify-between">
             {steps.map((step) => (
               <div key={step.number} className="flex flex-col items-center">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 transition-all ${
-                  step.number === currentStep 
-                    ? 'bg-blue-600 text-white shadow-lg scale-110' 
-                    : step.number < currentStep 
-                    ? 'bg-green-500 text-white' 
-                    : 'bg-gray-200 text-gray-500'
-                }`}>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 transition-all ${step.number === currentStep
+                    ? 'bg-blue-600 text-white shadow-lg scale-110'
+                    : step.number < currentStep
+                      ? 'bg-green-500 text-white'
+                      : 'bg-gray-200 text-gray-500'
+                  }`}>
                   {step.number < currentStep ? <FaCheckCircle /> : step.icon}
                 </div>
                 <span className="text-xs text-center hidden sm:block">{step.title}</span>
@@ -581,7 +433,7 @@ export default function BookingModal({ vehicle, isOpen, onClose }) {
           {currentStep === 1 && (
             <div className="space-y-6">
               <h3 className="text-lg font-semibold">Select Dates & Location</h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -650,26 +502,24 @@ export default function BookingModal({ vehicle, isOpen, onClose }) {
           {currentStep === 2 && (
             <div className="space-y-6">
               <h3 className="text-lg font-semibold">Select Rental Type</h3>
-              
+
               <div className="space-y-4">
                 {/* Self Drive */}
-                <div 
-                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
-                    bookingData.rentalType === 'self' 
-                      ? 'border-blue-600 bg-blue-50' 
+                <div
+                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${bookingData.rentalType === 'self'
+                      ? 'border-blue-600 bg-blue-50'
                       : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                    }`}
                   onClick={() => {
                     handleInputChange('rentalType', 'self')
                     handleInputChange('withDriver', false)
                   }}
                 >
                   <div className="flex items-start gap-4">
-                    <div className={`p-3 rounded-lg ${
-                      bookingData.rentalType === 'self' 
-                        ? 'bg-blue-100 text-blue-600' 
+                    <div className={`p-3 rounded-lg ${bookingData.rentalType === 'self'
+                        ? 'bg-blue-100 text-blue-600'
                         : 'bg-gray-100 text-gray-500'
-                    }`}>
+                      }`}>
                       <FaKey className="text-xl" />
                     </div>
                     <div className="flex-1">
@@ -685,23 +535,21 @@ export default function BookingModal({ vehicle, isOpen, onClose }) {
                 </div>
 
                 {/* With Driver */}
-                <div 
-                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
-                    bookingData.rentalType === 'withDriver' 
-                      ? 'border-blue-600 bg-blue-50' 
+                <div
+                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${bookingData.rentalType === 'withDriver'
+                      ? 'border-blue-600 bg-blue-50'
                       : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                    }`}
                   onClick={() => {
                     handleInputChange('rentalType', 'withDriver')
                     handleInputChange('withDriver', true)
                   }}
                 >
                   <div className="flex items-start gap-4">
-                    <div className={`p-3 rounded-lg ${
-                      bookingData.rentalType === 'withDriver' 
-                        ? 'bg-blue-100 text-blue-600' 
+                    <div className={`p-3 rounded-lg ${bookingData.rentalType === 'withDriver'
+                        ? 'bg-blue-100 text-blue-600'
                         : 'bg-gray-100 text-gray-500'
-                    }`}>
+                      }`}>
                       <FaUserShield className="text-xl" />
                     </div>
                     <div className="flex-1">
@@ -712,7 +560,7 @@ export default function BookingModal({ vehicle, isOpen, onClose }) {
                         )}
                       </div>
                       <p className="text-sm text-gray-600 mt-1">Relax while our expert driver drives</p>
-                      
+
                       {bookingData.rentalType === 'withDriver' && (
                         <div className="mt-4 grid grid-cols-2 gap-4">
                           <div>
@@ -754,7 +602,7 @@ export default function BookingModal({ vehicle, isOpen, onClose }) {
           {currentStep === 3 && (
             <div className="space-y-6">
               <h3 className="text-lg font-semibold">Personal Details</h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -816,7 +664,7 @@ export default function BookingModal({ vehicle, isOpen, onClose }) {
           {currentStep === 4 && (
             <div className="space-y-6">
               <h3 className="text-lg font-semibold">Payment Method</h3>
-              
+
               <div className="space-y-4">
                 <label className="flex items-center gap-4 p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                   <input
@@ -900,9 +748,9 @@ export default function BookingModal({ vehicle, isOpen, onClose }) {
               <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <FaCheckCircle className="text-green-500 text-3xl" />
               </div>
-              
+
               <h3 className="text-2xl font-semibold mb-4">Confirm Your Booking</h3>
-              
+
               <div className="bg-gray-50 p-6 rounded-lg text-left mb-6">
                 <h4 className="font-semibold mb-4">Booking Summary</h4>
                 <div className="space-y-3">
@@ -944,22 +792,20 @@ export default function BookingModal({ vehicle, isOpen, onClose }) {
             <button
               onClick={handlePrevious}
               disabled={currentStep === 1}
-              className={`px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 ${
-                currentStep === 1 
-                  ? 'text-gray-400 cursor-not-allowed' 
+              className={`px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 ${currentStep === 1
+                  ? 'text-gray-400 cursor-not-allowed'
                   : 'text-blue-600 hover:bg-blue-50 border border-gray-300'
-              }`}
+                }`}
             >
               <FaArrowLeft />
               Previous
             </button>
-            
+
             <button
               onClick={handleNext}
               disabled={isLoading}
-              className={`bg-blue-600 text-white px-8 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 ${
-                isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700'
-              }`}
+              className={`bg-blue-600 text-white px-8 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 ${isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700'
+                }`}
             >
               {isLoading ? (
                 <>

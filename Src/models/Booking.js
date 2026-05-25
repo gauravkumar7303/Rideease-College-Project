@@ -1,4 +1,6 @@
-import mongoose from './mongoose';
+//Path: Src/models/Booking.js
+// Path: Src/models/Booking.js
+import mongoose from 'mongoose';
 
 const bookingSchema = new mongoose.Schema({
   bookingId: { type: String, required: true, unique: true },
@@ -52,8 +54,40 @@ const bookingSchema = new mongoose.Schema({
   // Status
   status: { 
     type: String, 
-    enum: ['pending', 'confirmed', 'ongoing', 'completed', 'cancelled', 'rejected'], 
+    enum: ['pending', 'confirmed', 'rep_pickup', 'rep_delivery', 'ongoing', 'rep_collection', 'rep_return', 'completed', 'cancelled', 'rejected'], 
     default: 'pending' 
+  },
+  
+  // Rep Actions
+  repActions: {
+    pickupFromOwner: {
+      status: { type: String, enum: ['pending', 'in_progress', 'completed'], default: 'pending' },
+      scheduledTime: Date,
+      completedTime: Date,
+      repId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      notes: String
+    },
+    deliverToUser: {
+      status: { type: String, enum: ['pending', 'in_progress', 'completed'], default: 'pending' },
+      scheduledTime: Date,
+      completedTime: Date,
+      repId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      notes: String
+    },
+    collectFromUser: {
+      status: { type: String, enum: ['pending', 'in_progress', 'completed'], default: 'pending' },
+      scheduledTime: Date,
+      completedTime: Date,
+      repId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      notes: String
+    },
+    returnToOwner: {
+      status: { type: String, enum: ['pending', 'in_progress', 'completed'], default: 'pending' },
+      scheduledTime: Date,
+      completedTime: Date,
+      repId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      notes: String
+    }
   },
   
   // Cancellation
@@ -70,13 +104,33 @@ const bookingSchema = new mongoose.Schema({
   vehicleRating: Number,
   vehicleReview: String,
   
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  // Customer Details
+  customerDetails: {
+    name: String,
+    email: String,
+    phone: String,
+    licenseNumber: String,
+    address: String,
+    emergencyContact: String
+  }
+  
+}, { 
+  timestamps: true  // ✅ This automatically handles createdAt and updatedAt
 });
 
-bookingSchema.pre('save', function(next) {
-  this.updatedAt = Date.now();
-  next();
-});
+// ✅ REMOVED the problematic pre-save middleware
+// No need for bookingSchema.pre('save', ...) because timestamps: true handles it
 
-export default mongoose.models.Booking || mongoose.model('Booking', bookingSchema);
+// Indexes for better performance
+bookingSchema.index({ bookingId: 1 }, { unique: true });
+bookingSchema.index({ customer: 1 });
+bookingSchema.index({ vehicle: 1 });
+bookingSchema.index({ status: 1 });
+bookingSchema.index({ pickupDate: 1 });
+bookingSchema.index({ driver: 1 });
+bookingSchema.index({ 'repActions.pickupFromOwner.status': 1 });
+bookingSchema.index({ 'repActions.deliverToUser.status': 1 });
+
+const Booking = mongoose.models.Booking || mongoose.model('Booking', bookingSchema);
+
+export default Booking;
