@@ -1,17 +1,18 @@
 //Path: app/api/drivers/available/route.js
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/Src/lib/db';
-import User from '@/Src/models/User';
+import Driver from '@/Src/models/Driver';  // ✅ New Driver model
 
 export async function GET() {
   try {
     await connectDB();
     
-    const drivers = await User.find({
-      role: 'driver',
-      'driverDetails.isVerified': true,
-      'driverDetails.availability': true
-    }).select('name phone driverDetails.rating driverDetails.totalTrips');
+    // ✅ Fetch from Driver collection, not User
+    const drivers = await Driver.find({
+      isAvailable: true,
+      isVerified: true,
+      status: 'active'
+    }).select('name email phone rating totalTrips vehicleTypes languages currentLocation');
     
     return NextResponse.json({
       success: true,
@@ -19,6 +20,7 @@ export async function GET() {
       drivers
     });
   } catch (error) {
+    console.error('❌ Error fetching drivers:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
