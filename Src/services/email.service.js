@@ -420,17 +420,308 @@
 // }
 
 
-//Path: app/api/vehicles/create/route.js
+// //Path: app/api/vehicles/create/route.js
+// import { Resend } from 'resend';
+
+// const resend = new Resend(process.env.RESEND_API_KEY);
+
+// export class EmailService {
+//   // Send OTP email
+//   static async sendOTP(email, otp) {
+//     try {
+//       console.log('📧 [DEBUG] Sending OTP to:', email);
+//       console.log('📧 [DEBUG] OTP Code:', otp);
+
+//       const { data, error } = await resend.emails.send({
+//         from: 'onboarding@resend.dev',
+//         to: [email],
+//         subject: 'Your RideEase Verification Code',
+//         html: `
+//           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+//             <h1 style="color: #3b82f6; text-align: center;">RideEase Verification</h1>
+//             <p style="font-size: 16px;">Hello!</p>
+//             <p style="font-size: 16px;">Your verification code is:</p>
+//             <div style="background: #f3f4f6; padding: 20px; text-align: center; margin: 20px 0; border-radius: 8px;">
+//               <h2 style="color: #3b82f6; margin: 0; font-size: 36px; letter-spacing: 10px;">${otp}</h2>
+//             </div>
+//             <p style="font-size: 14px; color: #6b7280;">This code will expire in 10 minutes.</p>
+//             <p style="font-size: 14px; color: #6b7280;">If you didn't request this code, please ignore this email.</p>
+//             <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;" />
+//             <p style="font-size: 14px; color: #6b7280; text-align: center;">Best regards,<br>RideEase Team</p>
+//           </div>
+//         `,
+//       });
+
+//       if (error) {
+//         console.error('❌ [DEBUG] Resend error:', error);
+//         if (process.env.NODE_ENV === 'development') {
+//           console.log(`📧 [DEV MODE] OTP for ${email}: ${otp}`);
+//           return true;
+//         }
+//         return false;
+//       }
+
+//       console.log('✅ [DEBUG] OTP email sent! ID:', data?.id);
+//       return true;
+
+//     } catch (error) {
+//       console.error('💥 [DEBUG] Email service error:', error);
+//       return false;
+//     }
+//   }
+
+//   // Send welcome email
+//   static async sendWelcomeEmail(email, name) {
+//     try {
+//       console.log('📧 [DEBUG] Sending welcome email to:', email);
+
+//       const { data, error } = await resend.emails.send({
+//         from: 'onboarding@resend.dev',
+//         to: [email],
+//         subject: `Welcome to RideEase, ${name}! 🎉`,
+//         html: `
+//           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+//             <h1 style="color: #3b82f6; text-align: center;">Welcome to RideEase, ${name}! 🚗</h1>
+//             <p style="font-size: 16px;">Your email has been successfully verified!</p>
+//             <p style="font-size: 16px;">Start exploring rides and book your first vehicle today.</p>
+//             <div style="text-align: center; margin: 30px 0;">
+//               <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}" style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Start Riding</a>
+//             </div>
+//             <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;" />
+//             <p style="font-size: 14px; color: #6b7280; text-align: center;">Best regards,<br>RideEase Team</p>
+//           </div>
+//         `,
+//       });
+
+//       if (error) {
+//         console.error('❌ [DEBUG] Welcome email error:', error);
+//         return false;
+//       }
+
+//       console.log('✅ [DEBUG] Welcome email sent! ID:', data?.id);
+//       return true;
+
+//     } catch (error) {
+//       console.error('💥 [DEBUG] Welcome email failed:', error);
+//       return false;
+//     }
+//   }
+
+//   // Send booking confirmation email
+//   static async sendBookingConfirmation(bookingDetails) {
+//     try {
+//       const { 
+//         email, name, bookingId, vehicle, bookingType, 
+//         driverName, driverPhone, driverRating, pickupDate, returnDate, 
+//         pickupLocation, totalAmount, representativeName, 
+//         representativePhone, representativeZone, baseAmount,
+//         driverCharges, insuranceCharges, serviceFee, securityDeposit
+//       } = bookingDetails;
+      
+//       console.log('📧 [DEBUG] ========== BOOKING EMAIL DEBUG ==========');
+//       console.log('📧 [DEBUG] To Email:', email);
+//       console.log('📧 [DEBUG] Customer Name:', name);
+//       console.log('📧 [DEBUG] Booking ID:', bookingId);
+//       console.log('📧 [DEBUG] Vehicle:', vehicle);
+//       console.log('📧 [DEBUG] Total Amount:', totalAmount);
+//       console.log('📧 [DEBUG] ==========================================');
+      
+//       if (!email || !email.includes('@')) {
+//         console.error('❌ [DEBUG] Invalid email address:', email);
+//         return false;
+//       }
+      
+//       const subtotal = baseAmount || 0;
+//       const driverFee = driverCharges || 0;
+//       const insurance = insuranceCharges || 200;
+//       const service = serviceFee || 100;
+//       const deposit = securityDeposit || 5000;
+      
+//       const emailHtml = `
+//         <!DOCTYPE html>
+//         <html>
+//         <head>
+//           <style>
+//             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+//             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+//             .header { background: linear-gradient(135deg, #2563eb, #1e40af); padding: 30px; text-align: center; border-radius: 12px 12px 0 0; }
+//             .header h1 { color: white; margin: 0; }
+//             .header p { color: #bfdbfe; }
+//             .content { background: #f8fafc; padding: 30px; border-radius: 0 0 12px 12px; }
+//             .details { background: white; padding: 20px; border-radius: 12px; margin: 20px 0; }
+//             .driver-card { background: #dbeafe; padding: 15px; border-radius: 12px; margin: 15px 0; border-left: 4px solid #2563eb; }
+//             .rep-card { background: #dcfce7; padding: 15px; border-radius: 12px; margin: 15px 0; border-left: 4px solid #22c55e; }
+//             .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e2e8f0; }
+//             .total-row { background: #dcfce7; padding: 15px; border-radius: 8px; margin: 15px 0; }
+//             .breakdown { background: #f1f5f9; padding: 15px; border-radius: 8px; margin: 15px 0; }
+//             .button { background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block; }
+//           </style>
+//         </head>
+//         <body>
+//           <div class="container">
+//             <div class="header">
+//               <h1>🚗 RideEase</h1>
+//               <p>Booking Confirmed!</p>
+//             </div>
+//             <div class="content">
+//               <h2>Hello ${name}! 👋</h2>
+//               <p>Your booking has been <strong>confirmed successfully</strong>.</p>
+//               ${driverName && driverName !== 'Not applicable' ? `
+//               <div class="driver-card">
+//                 <h3 style="margin-top: 0; color: #1e40af;">👨‍✈️ Your Driver</h3>
+//                 <div class="detail-row"><span>Name:</span><strong>${driverName}</strong></div>
+//                 <div class="detail-row"><span>Phone:</span><strong>${driverPhone || 'N/A'}</strong></div>
+//                 <div class="detail-row"><span>Rating:</span><strong>⭐ ${driverRating || '5.0'}</strong></div>
+//               </div>
+//               ` : ''}
+//               <div class="rep-card">
+//                 <h3 style="margin-top: 0; color: #166534;">👔 Your Service Representative</h3>
+//                 <div class="detail-row"><span>Name:</span><strong>${representativeName || 'Will be assigned'}</strong></div>
+//                 <div class="detail-row"><span>Phone:</span><strong>${representativePhone || 'N/A'}</strong></div>
+//                 <div class="detail-row"><span>Zone:</span><strong>${representativeZone || 'Delhi'}</strong></div>
+//               </div>
+//               <div class="details">
+//                 <h3 style="margin-top: 0;">📋 Booking Details</h3>
+//                 <div class="detail-row"><span>Booking ID:</span><strong>${bookingId}</strong></div>
+//                 <div class="detail-row"><span>Vehicle:</span><strong>${vehicle}</strong></div>
+//                 <div class="detail-row"><span>Booking Type:</span><strong>${bookingType}</strong></div>
+//                 <div class="detail-row"><span>Pickup Location:</span><strong>${pickupLocation}</strong></div>
+//                 <div class="detail-row"><span>Pickup Date:</span><strong>${new Date(pickupDate).toLocaleString()}</strong></div>
+//                 <div class="detail-row"><span>Return Date:</span><strong>${new Date(returnDate).toLocaleString()}</strong></div>
+//               </div>
+//               <div class="breakdown">
+//                 <h3 style="margin-top: 0;">💰 Price Breakdown</h3>
+//                 <div class="detail-row"><span>Base Rental:</span><strong>₹${subtotal}</strong></div>
+//                 ${driverFee > 0 ? `<div class="detail-row"><span>Driver Charges:</span><strong>₹${driverFee}</strong></div>` : ''}
+//                 <div class="detail-row"><span>Insurance:</span><strong>₹${insurance}</strong></div>
+//                 <div class="detail-row"><span>Service Fee:</span><strong>₹${service}</strong></div>
+//                 <div class="detail-row"><span style="color: #dc2626;">Security Deposit (Refundable):</span><strong style="color: #dc2626;">₹${deposit}</strong></div>
+//               </div>
+//               <div class="total-row">
+//                 <div class="detail-row" style="border-bottom: none;">
+//                   <span><strong>Total Amount Paid:</strong></span>
+//                   <strong style="color: #2563eb; font-size: 20px;">₹${totalAmount}</strong>
+//                 </div>
+//               </div>
+//               <div style="text-align: center; margin: 30px 0;">
+//                 <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/profile?tab=bookings" class="button">View My Bookings</a>
+//               </div>
+//             </div>
+//             <div class="footer" style="text-align: center; padding: 20px; color: #64748b;">
+//               <p>🚀 Happy Riding!<br><strong>Team RideEase</strong></p>
+//             </div>
+//           </div>
+//         </body>
+//         </html>
+//       `;
+      
+//       const { data, error } = await resend.emails.send({
+//         from: 'onboarding@resend.dev',
+//         to: [email],
+//         subject: `🎉 Booking Confirmed! Your RideEase Booking #${bookingId}`,
+//         html: emailHtml
+//       });
+      
+//       if (error) {
+//         console.error('❌ [DEBUG] Resend API Error:', error);
+//         return false;
+//       }
+      
+//       console.log('✅ [DEBUG] Booking confirmation email sent! ID:', data?.id);
+//       return true;
+      
+//     } catch (error) {
+//       console.error('💥 [DEBUG] Booking email exception:', error);
+//       return false;
+//     }
+//   }
+
+//   // Send vehicle listing email to owner
+//   static async sendVehicleListingEmail({ email, name, vehicleName, registrationNumber, vehicleId }) {
+//     try {
+//       console.log('📧 [VEHICLE LISTING] Sending to owner:', email);
+//       console.log('📧 [VEHICLE LISTING] Vehicle:', vehicleName);
+//       console.log('📧 [VEHICLE LISTING] Registration:', registrationNumber);
+      
+//       if (!email || !email.includes('@')) {
+//         console.error('❌ [VEHICLE LISTING] Invalid email:', email);
+//         return false;
+//       }
+      
+//       const { data, error } = await resend.emails.send({
+//         from: 'onboarding@resend.dev',
+//         to: [email],
+//         subject: `✅ Vehicle Listed Successfully - ${vehicleName}`,
+//         html: `
+//           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+//             <div style="background: linear-gradient(135deg, #2563eb, #1e40af); padding: 30px; text-align: center; border-radius: 12px 12px 0 0;">
+//               <h1 style="color: white; margin: 0;">RideEase</h1>
+//               <p style="color: #bfdbfe;">Vehicle Listed Successfully</p>
+//             </div>
+//             <div style="background: #f8fafc; padding: 30px; border-radius: 0 0 12px 12px;">
+//               <h2>Hello ${name}! 👋</h2>
+//               <p>Your vehicle <strong>${vehicleName}</strong> has been successfully listed on RideEase.</p>
+//               <div style="background: white; padding: 20px; border-radius: 12px; margin: 20px 0;">
+//                 <h3 style="margin-top: 0;">📋 Vehicle Details</h3>
+//                 <p><strong>Vehicle:</strong> ${vehicleName}</p>
+//                 <p><strong>Registration Number:</strong> ${registrationNumber}</p>
+//                 <p><strong>Status:</strong> <span style="color: #eab308;">Pending Verification</span></p>
+//               </div>
+//               <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0;">
+//                 <p style="margin: 0; color: #92400e;">🔍 Our team will verify your vehicle within 24 hours.</p>
+//                 <p style="margin: 10px 0 0 0; color: #92400e;">You will receive an email once verified.</p>
+//               </div>
+//               <div style="text-align: center; margin: 30px 0;">
+//                 <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/profile?tab=vehicles" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px;">View My Vehicles</a>
+//               </div>
+//               <p style="font-size: 14px; color: #6b7280;">Thank you for choosing RideEase!</p>
+//               <p><strong>Team RideEase</strong></p>
+//             </div>
+//           </div>
+//         `
+//       });
+      
+//       if (error) {
+//         console.error('❌ [VEHICLE LISTING] Resend error:', error);
+//         return false;
+//       }
+      
+//       console.log('✅ [VEHICLE LISTING] Email sent! ID:', data?.id);
+//       return true;
+      
+//     } catch (error) {
+//       console.error('💥 [VEHICLE LISTING] Email error:', error);
+//       return false;
+//     }
+//   }
+// }
+
+// // Named exports for API routes
+// export async function sendBookingConfirmation(bookingDetails) {
+//   return EmailService.sendBookingConfirmation(bookingDetails);
+// }
+
+// export async function sendVehicleListingEmail(params) {
+//   return EmailService.sendVehicleListingEmail(params);
+// }
+
+
+
+// Path: Src/services/email.service.js
+
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// ✅ Listing notifications jaate hain is email pe
+const ADMIN_LISTING_EMAIL = 'gaurav.k7303@gmail.com';
+
 export class EmailService {
+
   // Send OTP email
   static async sendOTP(email, otp) {
     try {
       console.log('📧 [DEBUG] Sending OTP to:', email);
-      console.log('📧 [DEBUG] OTP Code:', otp);
 
       const { data, error } = await resend.emails.send({
         from: 'onboarding@resend.dev',
@@ -439,13 +730,11 @@ export class EmailService {
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h1 style="color: #3b82f6; text-align: center;">RideEase Verification</h1>
-            <p style="font-size: 16px;">Hello!</p>
             <p style="font-size: 16px;">Your verification code is:</p>
             <div style="background: #f3f4f6; padding: 20px; text-align: center; margin: 20px 0; border-radius: 8px;">
               <h2 style="color: #3b82f6; margin: 0; font-size: 36px; letter-spacing: 10px;">${otp}</h2>
             </div>
             <p style="font-size: 14px; color: #6b7280;">This code will expire in 10 minutes.</p>
-            <p style="font-size: 14px; color: #6b7280;">If you didn't request this code, please ignore this email.</p>
             <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;" />
             <p style="font-size: 14px; color: #6b7280; text-align: center;">Best regards,<br>RideEase Team</p>
           </div>
@@ -518,13 +807,7 @@ export class EmailService {
         driverCharges, insuranceCharges, serviceFee, securityDeposit
       } = bookingDetails;
       
-      console.log('📧 [DEBUG] ========== BOOKING EMAIL DEBUG ==========');
-      console.log('📧 [DEBUG] To Email:', email);
-      console.log('📧 [DEBUG] Customer Name:', name);
-      console.log('📧 [DEBUG] Booking ID:', bookingId);
-      console.log('📧 [DEBUG] Vehicle:', vehicle);
-      console.log('📧 [DEBUG] Total Amount:', totalAmount);
-      console.log('📧 [DEBUG] ==========================================');
+      console.log('📧 [DEBUG] Sending booking confirmation to:', email);
       
       if (!email || !email.includes('@')) {
         console.error('❌ [DEBUG] Invalid email address:', email);
@@ -607,7 +890,7 @@ export class EmailService {
                 <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/profile?tab=bookings" class="button">View My Bookings</a>
               </div>
             </div>
-            <div class="footer" style="text-align: center; padding: 20px; color: #64748b;">
+            <div style="text-align: center; padding: 20px; color: #64748b;">
               <p>🚀 Happy Riding!<br><strong>Team RideEase</strong></p>
             </div>
           </div>
@@ -636,61 +919,72 @@ export class EmailService {
     }
   }
 
-  // Send vehicle listing email to owner
+  // ✅ FIXED: Vehicle listing email — gaurav.k7303@gmail.com pe jaayegi
   static async sendVehicleListingEmail({ email, name, vehicleName, registrationNumber, vehicleId }) {
     try {
-      console.log('📧 [VEHICLE LISTING] Sending to owner:', email);
+      console.log('📧 [VEHICLE LISTING] Owner email:', email);
+      console.log('📧 [VEHICLE LISTING] Sending notification to admin:', ADMIN_LISTING_EMAIL);
       console.log('📧 [VEHICLE LISTING] Vehicle:', vehicleName);
-      console.log('📧 [VEHICLE LISTING] Registration:', registrationNumber);
-      
-      if (!email || !email.includes('@')) {
-        console.error('❌ [VEHICLE LISTING] Invalid email:', email);
-        return false;
-      }
-      
+
+      // ✅ SIRF ADMIN EMAIL PE JAATI HAI — gaurav.k7303@gmail.com
       const { data, error } = await resend.emails.send({
         from: 'onboarding@resend.dev',
-        to: [email],
-        subject: `✅ Vehicle Listed Successfully - ${vehicleName}`,
+        to: [ADMIN_LISTING_EMAIL],  // ← FIXED: owner ki jagah admin ko
+        subject: `🚗 New Vehicle Listed: ${vehicleName}`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background: linear-gradient(135deg, #2563eb, #1e40af); padding: 30px; text-align: center; border-radius: 12px 12px 0 0;">
-              <h1 style="color: white; margin: 0;">RideEase</h1>
-              <p style="color: #bfdbfe;">Vehicle Listed Successfully</p>
+            <div style="background: linear-gradient(135deg, #1d4ed8, #1e40af); padding: 30px; text-align: center; border-radius: 12px 12px 0 0;">
+              <h1 style="color: white; margin: 0;">🚗 RideEase</h1>
+              <p style="color: #bfdbfe; margin: 5px 0 0;">New Vehicle Listed</p>
             </div>
-            <div style="background: #f8fafc; padding: 30px; border-radius: 0 0 12px 12px;">
-              <h2>Hello ${name}! 👋</h2>
-              <p>Your vehicle <strong>${vehicleName}</strong> has been successfully listed on RideEase.</p>
-              <div style="background: white; padding: 20px; border-radius: 12px; margin: 20px 0;">
-                <h3 style="margin-top: 0;">📋 Vehicle Details</h3>
-                <p><strong>Vehicle:</strong> ${vehicleName}</p>
-                <p><strong>Registration Number:</strong> ${registrationNumber}</p>
-                <p><strong>Status:</strong> <span style="color: #eab308;">Pending Verification</span></p>
+            <div style="background: #f8fafc; padding: 30px; border-radius: 0 0 12px 12px; border: 1px solid #e2e8f0; border-top: none;">
+              
+              <p style="color: #374151; font-size: 15px; margin-top: 0;">
+                A new vehicle has been submitted for listing on RideEase.
+              </p>
+
+              <div style="background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin: 16px 0;">
+                <h3 style="margin-top: 0; color: #1e40af; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Vehicle Details</h3>
+                <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                  <tr><td style="padding: 8px 0; color: #6b7280; width: 45%;">Vehicle Name</td><td style="padding: 8px 0; font-weight: bold; color: #111827;">${vehicleName}</td></tr>
+                  <tr style="background: #f9fafb;"><td style="padding: 8px 4px; color: #6b7280;">Registration No.</td><td style="padding: 8px 4px; font-weight: bold; color: #111827;">${registrationNumber}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #6b7280;">Status</td><td style="padding: 8px 0;"><span style="background: #fef3c7; color: #92400e; padding: 2px 10px; border-radius: 99px; font-size: 12px; font-weight: bold;">⏳ Pending Verification</span></td></tr>
+                </table>
               </div>
-              <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                <p style="margin: 0; color: #92400e;">🔍 Our team will verify your vehicle within 24 hours.</p>
-                <p style="margin: 10px 0 0 0; color: #92400e;">You will receive an email once verified.</p>
+
+              <div style="background: #eff6ff; border-left: 4px solid #1d4ed8; border-radius: 4px; padding: 14px; margin: 16px 0;">
+                <p style="margin: 0; color: #1e40af; font-size: 14px; font-weight: bold;">Owner Details</p>
+                <p style="margin: 8px 0 0; color: #374151; font-size: 14px;">
+                  👤 <strong>${name}</strong><br/>
+                  📧 ${email || 'N/A'}
+                </p>
               </div>
-              <div style="text-align: center; margin: 30px 0;">
-                <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/profile?tab=vehicles" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px;">View My Vehicles</a>
+
+              <div style="background: #fef9c3; border-left: 4px solid #eab308; border-radius: 4px; padding: 14px; margin: 16px 0;">
+                <p style="margin: 0; color: #854d0e; font-size: 13px;">
+                  ⚠️ <strong>Action Required:</strong> Please verify this vehicle before it goes live for rentals.
+                </p>
               </div>
-              <p style="font-size: 14px; color: #6b7280;">Thank you for choosing RideEase!</p>
-              <p><strong>Team RideEase</strong></p>
+
+              <p style="color: #9ca3af; font-size: 12px; margin-top: 20px; border-top: 1px solid #e5e7eb; padding-top: 16px;">
+                Vehicle ID: ${vehicleId}<br/>
+                Received at: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST
+              </p>
             </div>
           </div>
         `
       });
-      
+
       if (error) {
         console.error('❌ [VEHICLE LISTING] Resend error:', error);
         return false;
       }
-      
-      console.log('✅ [VEHICLE LISTING] Email sent! ID:', data?.id);
+
+      console.log('✅ [VEHICLE LISTING] Admin notification sent! ID:', data?.id);
       return true;
-      
+
     } catch (error) {
-      console.error('💥 [VEHICLE LISTING] Email error:', error);
+      console.error('💥 [VEHICLE LISTING] Email exception:', error);
       return false;
     }
   }
